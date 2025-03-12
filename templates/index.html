@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BackyardiFeelings</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
+  <style>
+    :root {
+      --amarillo-uniqua: #FFFF00;
+      --azul-tyrone: #87CEEB;
+      --rosa-tasha: #FF69B4;
+      --naranja-pablo: #FFA500;
+      --verde-austin: #90EE90;
+      --gris-spotify: #282828;
+      --gris-claro-spotify: #b3b3b3;
+      --negro-spotify: #121212;
+    }
+
+    /* Comic-like dotted background */
+    body {
+      background-color: var(--negro-spotify);
+      background-image: radial-gradient(#777 1px, transparent 1px), radial-gradient(#777 1px, transparent 1px);
+      background-position: 0 0, 25px 25px;
+      background-size: 50px 50px;
+      color: var(--gris-claro-spotify);
+      font-family: 'Montserrat', sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .container {
+      width: 90%;
+      max-width: 800px;
+      margin: 20px auto;
+      padding: 20px;
+      background-color: rgba(255, 255, 255, 0.85);
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      padding-bottom: 60px;
+    }
+
+    .header {
+      margin-bottom: 20px;
+    }
+
+    .title {
+      color: var(--verde-austin);
+      font-size: 2em;
+      background: linear-gradient(90deg, #99ccff, #99ffd6, #ffc4a3, #fff2a3);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin: 0;
+      text-shadow: 2px 2px 2px rgba(0, 0, 0, 0.5);
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .form-group {
+      width: 100%;
+      margin-bottom: 15px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 5px;
+      color: var(--gris-claro-spotify);
+    }
+
+    select, input[type="text"], input[type="number"], input[type="email"] {
+      width: 100%;
+      padding: 15px;
+      border: 1px solid #f0b7a4;
+      border-radius: 10px;
+      box-sizing: border-box;
+      background-color: #f5f4f3;
+      color: #305f72;
+      font-size: 1em;
+    }
+
+    button {
+      background-color: #f1d1b5;
+      color: #305f72;
+      padding: 15px 30px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 1em;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #f18c8e;
+    }
+
+    .tracks-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      grid-gap: 20px;
+      margin-top: 20px;
+    }
+
+    .recomendacion {
+      border: 1px solid #042455;
+      padding: 15px;
+      border-radius: 5px;
+      background-color: #e4f2f8;
+      color: #305f72;
+      text-align: center;
+      font-family: 'Times New Roman', sans-serif;
+    }
+
+    .recomendacion img {
+      max-width: 100%;
+      height: auto;
+      margin-bottom: 10px;
+    }
+
+    .preferencias {
+      margin-top: 20px;
+    }
+
+    .footer {
+      text-align: center;
+      padding: 20px;
+      color: #777;
+      width: 100%;
+      position: relative;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1 class="title">BackyardiFeelings</h1>
+      <p>El lugar en el que la música te encuentra a ti</p>
+    </div>
+
+    {% if not tracks %}
+      {% if not mensaje_usuario %}
+        <!-- User Details Form -->
+        <form method="post" action="{{ url_for('register') }}">
+          <div class="form-group">
+            <label for="nombre">Nombre:</label>
+            <input type="text" name="nombre" id="nombre" required>
+          </div>
+          <div class="form-group">
+            <label for="edad">Edad:</label>
+            <input type="number" name="edad" id="edad" required>
+          </div>
+          <div class="form-group">
+            <label for="pais">País:</label>
+            <input type="text" name="pais" id="pais" required>
+          </div>
+          <div class="form-group">
+            <label for="correo">Correo:</label>
+            <input type="email" name="correo" id="correo" required>
+          </div>
+          <div class="form-group">
+            <label for="genero_favorito">Género favorito:</label>
+            <input type="text" name="genero_favorito" id="genero_favorito" required>
+          </div>
+          <button type="submit">Guardar datos</button>
+        </form>
+      {% else %}
+        <!-- Data Saved; now ask for playlist details -->
+        <p>{{ mensaje_usuario }}</p>
+        <form method="post" action="{{ url_for('playlist') }}">
+          <div class="form-group">
+            <label for="genre">Género:</label>
+            <select name="genre" id="genre">
+              {% for genre in genres %}
+                <option value="{{ genre }}">{{ genre.title() }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="artist">Artista (Opcional):</label>
+            <input type="text" name="artist" id="artist" placeholder="e.g., Billie Eilish">
+          </div>
+          <div class="form-group">
+            <label for="mood">Estado de ánimo:</label>
+            <select name="mood" id="mood">
+              {% for mood in moods %}
+                <option value="{{ mood }}">{{ mood.title() }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <button type="submit">Obtener mi playlist</button>
+        </form>
+      {% endif %}
+    {% else %}
+      <!-- Display Track Recommendations -->
+      <div class="tracks-container">
+        {% for track in tracks %}
+          <div class="recomendacion" data-track-id="{{ track.id }}">
+            {% if track.album.images %}
+              <img src="{{ track.album.images[0].url }}" alt="Portada">
+            {% endif %}
+            <h3>{{ track.name }}</h3>
+            {% if track.artists %}
+              <p>Artista: {{ track.artists[0].name }}</p>
+            {% endif %}
+            {% if track.album %}
+              <p>Álbum: {{ track.album.name }}</p>
+            {% endif %}
+            <p>Por qué te gusta este género {% if track.album.genres %}{{ track.album.genres[0] }}{% endif %}</p>
+            <a href="{{ track.external_urls.spotify }}" target="_blank">Escuchar en Spotify</a>
+            <iframe src="https://open.spotify.com/embed/track/{{ track.id }}"
+                    title="Spotify track: {{ track.name }}"
+                    width="300" height="80"
+                    frameborder="0"
+                    allowtransparency="true"
+                    allow="encrypted-media">
+            </iframe>
+          </div>
+        {% endfor %}
+      </div>
+      <div class="preferencias">
+        <!-- Additional preferences can be added here -->
+      </div>
+      <button onclick="window.location.href='{{ url_for('index') }}';">Hacer otra playlist</button>
+        Hacer otra playlist
+      </button>
+    {% endif %}
+  </div>
+  <div class="footer">
+    Footer Content
+  </div>
+</body>
+</html>
